@@ -1,0 +1,87 @@
+---
+title: "Lab 1"
+author: "Takahiro Wada"
+date: "2023-02-19"
+output: pdf_document
+---
+# Lab 1
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+df = read.csv("Absenteeism_at_work.csv",sep=";",header=TRUE)
+head(df)
+library(dplyr)
+attach(df)
+```
+
+## Question 1:
+```{r}
+plot(Weight, Height, main = "Scatter Plot of Weight VS Height")
+```
+Based on the graph we can see no correlation between weigh and height, so it is not very useful.
+
+## Question 2:
+```{r}
+hist(Absenteeism.time.in.hours, main = "Histogram of Absenteeism in Hours",
+     xlab = "Absenteeism in Hours")
+```
+
+Based off this graph, we see most of the employees have less than 20 Hours of absenteeism making the graph skew right.
+
+## Question 3:
+```{r}
+hist(Age, breaks = 20)
+```
+We can determine the age demographic of our absentees. The graph is relatively distributed evenly.
+
+
+## Question 4:
+```{r}
+library(dplyr)
+
+HoursMonth <- df %>%
+  group_by(Month.of.absence) %>%
+  summarise(total_absenteeism_hours = sum(Absenteeism.time.in.hours))
+
+barplot(HoursMonth$total_absenteeism_hours, 
+        names.arg = HoursMonth$Month.of.absence, 
+        xlab = "Month", 
+        ylab = "Total Absenteeism Hours", 
+        main = "Absenteeism Hours by Month")
+
+```
+Based on the graph, we see that March and July are the months with the largest absentee hours.
+
+
+## Question 5:
+```{r}
+library(dplyr)
+
+smoker <-recode_factor(df$Social.smoker, '0' = "Non-Smoker", '1' = "Smoker")
+unique(smoker)
+boxplot(Absenteeism.time.in.hours ~ smoker, data = df,
+        xlab = "Social Smoker",
+        ylab = "Absenteeism In Hours",
+        main = "Box plot of Absenteeism Time by Social Smoker",
+        horizontal = TRUE, col = c("blue", "red"))
+
+```
+
+The boxplot is skewed due to many outliers. The plot is not very useful.
+
+## Question 6:
+```{r}
+library(dplyr)
+
+drinker <-recode_factor(df$Social.drinker, '0' = "Non-Drinker", '1' = "Drinker")
+unique(drinker)
+boxplot(Absenteeism.time.in.hours ~ drinker, data = df,
+        xlab = "Social Drinker",
+        ylab = "Absenteeism In Hours",
+        main = "Box plot of Absenteeism Time by Social Drinker",
+        horizontal = TRUE, col = c("blue", "red"))
+
+```
+As seen as the Social Smoker's graph, the graph is also skewed with more outliers on the graph. This graph is not very useful.
