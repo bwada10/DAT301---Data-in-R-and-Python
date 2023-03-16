@@ -1,0 +1,168 @@
+---
+title: "Lab 2"
+author: "Takahiro Wada"
+date: "2023-03-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(ggplot2movies)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+data(movies)
+```
+
+# 1
+```{r}
+max(movies$year)
+min(movies$year)
+?movies
+```
+# 2
+```{r}
+ProportionOfMovies <- 100 - (sum(is.na(movies$budget))/58788)*100 
+ProportionOfMovies
+
+ProportionOfMoviesNA <- (sum(is.na(movies$budget))/58788)*100
+ProportionOfMoviesNA
+
+Top5 <- movies[order(movies$budget, decreasing = TRUE), c("title", "year", "budget")] 
+head(Top5, 5)
+
+```
+# 3
+```{r}
+Longest <- movies[order(movies$length, decreasing = TRUE), c("title", "year", "length")] 
+head(Longest, 5)
+```
+# 4
+```{r}
+ShortMovies <- movies[movies$Short == "1",]
+ShortestShortMovie <- ShortMovies[which.min(ShortMovies$length),]
+ShortestShortMovie  
+LongestShortMovie <- ShortMovies[which.max(ShortMovies$length),]
+LongestShortMovie
+
+```
+# 5
+```{r}
+MovieGenre <- data.frame(Genre = c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"),
+                         Frequency = c(sum(movies$Action), sum(movies$Animation), sum(movies$Comedy), sum(movies$Drama), sum(movies$Documentary), sum(movies$Romance), sum(movies$Short)))
+  
+ggplot(data = MovieGenre, aes(x = Genre, y = Frequency)) +
+  geom_bar(stat = "Identity", width = 0.7,  fill = "steelblue")
+```
+# 6
+```{r}
+ActionMovie <- movies[movies$Action == 1,]
+AnimationMovie <- movies[movies$Animation == 1,]
+ComedyMovie <- movies[movies$Comedy == 1,]
+DramaMovie <- movies[movies$Drama == 1,]
+DocumentaryMovie <- movies[movies$Documentary == 1,]
+RomanceMovie <- movies[movies$Romance == 1,]
+ShortMovie <- movies[movies$Short == 1,]
+
+MovieGenre <- data.frame(Genre = c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"),
+                         Frequency = c(mean(ActionMovie$rating), mean(AnimationMovie$rating), mean(ComedyMovie$rating), mean(DramaMovie$rating), mean(RomanceMovie$rating), mean(RomanceMovie$rating), mean(ShortMovie$rating)))
+  
+ggplot(data = MovieGenre, aes(x = Genre, y = Frequency)) +
+  geom_bar(stat = "Identity", width = 0.7,  fill = "steelblue")
+```
+
+# 7
+```{r}
+ActionMovie <- movies[movies$Action == 1,]
+ActionMovieYear <- ActionMovie[ActionMovie$year >= 2000 & ActionMovie$year <= 2005,]
+
+AnimationMovie <- movies[movies$Animation == 1,]
+AnimationMovieYear <- AnimationMovie[AnimationMovie$year >= 2000 & AnimationMovie$year <= 2005,]
+
+ComedyMovie <- movies[movies$Comedy == 1,]
+ComedyMovieYear <- ComedyMovie[ComedyMovie$year >= 2000 & ComedyMovie$year <= 2005,]
+
+DramaMovie <- movies[movies$Drama == 1,]
+DramaMovieYear <- DramaMovie[DramaMovie$year >= 2000 & DramaMovie$year <= 2005,]
+
+DocumentaryMovie <- movies[movies$Documentary == 1,]
+DocumentaryMovieYear <- DocumentaryMovie[DocumentaryMovie$year >= 2000 & DocumentaryMovie$year <= 2005,]
+
+RomanceMovie <- movies[movies$Romance == 1,]
+RomanceMovieYear <- RomanceMovie[RomanceMovie$year >= 2000 & RomanceMovie$year <= 2005,]
+
+ShortMovie <- movies[movies$Short == 1,]
+ShortMovieYear <- ShortMovie[ShortMovie$year >= 2000 & ShortMovie$year <= 2005,]
+
+MovieGenre <- data.frame(Genre = c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"),
+                         Frequency = c(mean(ActionMovieYear$rating), mean(AnimationMovieYear$rating), mean(ComedyMovieYear$rating), mean(DramaMovieYear$rating), mean(RomanceMovieYear$rating), mean(RomanceMovieYear$rating), mean(ShortMovieYear$rating)))
+  
+ggplot(data = MovieGenre, aes(x = Genre, y = Frequency)) +
+  geom_bar(stat = "Identity", width = 0.7,  fill = "steelblue")
+```
+
+# 8
+```{r}
+Year <- 1990:2005
+movies1990 <- movies[movies$year >= 1990,]
+
+ActionMovieYear <- movies1990[movies1990$Action == 1,]
+AnimationMovieYear <- movies1990[movies1990$Animation == 1,]
+ComedyMovieYear <- movies1990[movies1990$Comedy == 1,]
+DramaMovieYear <- movies1990[movies1990$Drama == 1,]
+DocumentaryMovieYear <- movies1990[movies1990$Documentary == 1,]
+RomanceMovieYear <- movies1990[movies1990$Romance == 1,]
+
+MovieGenre <- data.frame(Year = Year)
+
+MovieGenre <- MovieGenre %>%
+  group_by(Year) %>%
+  mutate(Action = sum(ActionMovieYear$year == Year),
+         Animation = sum(AnimationMovieYear$year == Year),
+         Comedy = sum(ComedyMovieYear$year == Year),
+         Drama = sum(DramaMovieYear$year == Year),
+         Documentary = sum(DocumentaryMovieYear$year == Year),
+         Romance = sum(RomanceMovieYear$year == Year)) %>%
+  gather(key = Genre, value = Frequency, -Year)
+
+
+ggplot(data = MovieGenre, aes(x = Year, y = Frequency, color = Genre)) +
+  geom_line() +
+  labs(x = "Year", y = "Frequency", color = "Genre")
+```
+
+# 9
+## Which movie has the  highest budget?
+```{r}
+max(movies$budget, na.rm = TRUE)
+```
+
+
+# 10
+## What is the number of movies with a budget greater than $1 million and have a rating greater than 5.
+```{r}
+sum(movies$budget > 1000000 & movies$rating > 5, na.rm = TRUE)
+```
+
+# 11
+## Which genre had the largest budget for their movies?
+```{r}
+ActionMovie <- movies[movies$Action == 1,]
+AnimationMovie <- movies[movies$Animation == 1,]
+ComedyMovie <- movies[movies$Comedy == 1,]
+DramaMovie <- movies[movies$Drama == 1,]
+DocumentaryMovie <- movies[movies$Documentary == 1,]
+RomanceMovie <- movies[movies$Romance == 1,]
+ShortMovie <- movies[movies$Short == 1,]
+
+MovieGenre <- data.frame(Genre = c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"),
+                         Budget = c(sum(ActionMovie$budget, na.rm = TRUE), sum(AnimationMovie$budget, na.rm = TRUE), sum(ComedyMovie$budget, na.rm = TRUE), sum(DramaMovie$budget, na.rm = TRUE), sum(RomanceMovie$budget, na.rm = TRUE), sum(RomanceMovie$budget, na.rm = TRUE), sum(ShortMovie$budget, na.rm = TRUE)))
+  
+ggplot(data = MovieGenre, aes(x = Genre, y = Budget)) +
+  geom_bar(stat = "Identity", width = 0.7,  fill = "deeppink")
+
+```
+
